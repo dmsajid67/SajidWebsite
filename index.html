@@ -119,6 +119,14 @@
 <div id="cartDrawer" class="drawer hidden">
   <div class="drawer-box">
     <div class="drawer-head"><h2>Your Bag</h2><button onclick="toggleCart()">×</button></div>
+    <div id="buyPreview" class="buy-preview hidden">
+      <div class="buy-preview-image"><img id="buyPreviewImage" src="" alt=""></div>
+      <div class="buy-preview-info">
+        <span>BUY NOW</span>
+        <h3 id="buyPreviewName"></h3>
+        <p id="buyPreviewPrice"></p>
+      </div>
+    </div>
     <div id="cartItems" class="cart-items"></div>
     <div class="cart-foot">
       <div class="total"><span>Total</span><b id="cartTotal">$0.00</b></div>
@@ -175,7 +183,7 @@
       <button onclick="zoomImage(0.15)">＋</button>
       <button onclick="resetImageZoom()">Reset</button>
     </div>
-    <div class="viewer-stage">
+    <div class="viewer-stage" id="viewerStage">
       <img id="viewerImage" src="" alt="">
     </div>
     <div class="viewer-name" id="viewerName"></div>
