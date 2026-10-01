@@ -45,7 +45,13 @@ function filterCategory(cat,btn){
 function searchProducts(){const q=document.getElementById("search").value.toLowerCase().trim();renderProducts(products.filter(p=>(p.name+" "+p.cat+" "+p.desc).toLowerCase().includes(q)))}
 function scrollToProducts(){document.querySelector(".content").scrollIntoView({behavior:"smooth"})}
 function addToCart(id){const p=products.find(x=>x.id===id);if(!p)return;const row=cart.find(x=>x.id===id);if(row)row.qty++;else cart.push({id,qty:1});save();renderCart();toast("Added to your bag.");}
-function buyNow(id){addToCart(id);toggleCart()}
+function buyNow(id){
+ const p=products.find(x=>x.id===id);
+ if(!p)return;
+ addToCart(id);
+ showBuyPreview(p);
+ document.getElementById("cartDrawer").classList.remove("hidden");
+}
 function renderCart(){
  const el=document.getElementById("cartItems"),count=cart.reduce((a,x)=>a+x.qty,0);document.getElementById("cartCount").textContent=count;
  if(!cart.length){el.innerHTML='<div style="text-align:center;color:#999;padding:60px 10px;font-size:12px">Your bag is empty.</div>';document.getElementById("cartTotal").textContent="$0.00";return}
@@ -54,6 +60,14 @@ function renderCart(){
 function changeQty(id,n){const r=cart.find(x=>x.id===id);if(!r)return;r.qty+=n;if(r.qty<=0)cart=cart.filter(x=>x.id!==id);save();renderCart()}
 function removeItem(id){cart=cart.filter(x=>x.id!==id);save();renderCart()}
 function toggleCart() {document.getElementById("cartDrawer").classList.toggle("hidden")}
+function showBuyPreview(p){
+ const wrap=document.getElementById("buyPreview");
+ document.getElementById("buyPreviewImage").src=p.image;
+ document.getElementById("buyPreviewImage").alt=p.name;
+ document.getElementById("buyPreviewName").textContent=p.name;
+ document.getElementById("buyPreviewPrice").textContent=money(p.price);
+ wrap.classList.remove("hidden");
+}
 function checkout(){if(!cart.length){toast("Your bag is empty.");return}if(!logged){openAuth();return}let total=cart.reduce((sum,r)=>sum+products.find(p=>p.id===r.id).price*r.qty,0);orders.unshift({id:"ORD-"+Math.floor(10000+Math.random()*90000),date:new Date().toLocaleDateString(),total,items:cart.map(r=>({name:products.find(p=>p.id===r.id).name,qty:r.qty,price:products.find(p=>p.id===r.id).price})),status:"Processing"});cart=[];save();renderCart();toggleCart();renderOrders();showSection("orders");toast("Order placed successfully!")}
 function renderOrders(){const el=document.getElementById("ordersList");if(!orders.length){el.innerHTML='<div class="order-card" style="text-align:center;color:#999">No orders yet.</div>';return}el.className="orders-list";el.innerHTML=orders.map(o=>`<article class="order-card"><div class="order-top"><div><div class="order-id">${o.id}</div><small>${o.date}</small></div><b>${money(o.total)}</b></div><div class="order-products">${o.items.map(i=>`<div>${i.qty}× ${i.name} — ${money(i.price*i.qty)}</div>`).join("")}</div><div class="status">● ${o.status}</div></article>`).join("")}
 function showSection(id){document.querySelectorAll("main .section").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));const buttons=[...document.querySelectorAll(".nav-btn")];const map={shop:0,lookbooks:1,orders:2};if(map[id]!==undefined)buttons[map[id]].classList.add("active");window.scrollTo({top:0,behavior:"smooth"})}
@@ -70,22 +84,38 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
 renderProducts();renderCart();renderOrders();updateProfile();goHome();
 
 let viewerScale=1;
+let viewerX=0, viewerY=0;
+let viewerDragging=false;
+let viewerDragStartX=0, viewerDragStartY=0;
+let pinchStartDistance=0;
+let pinchStartScale=1;
+
 function openImageViewer(src,name){
-  viewerScale=1;
+  viewerScale=1; viewerX=0; viewerY=0;
   const modal=document.getElementById("imageViewer");
   const img=document.getElementById("viewerImage");
   img.src=src; img.alt=name;
   document.getElementById("viewerName").textContent=name;
   modal.classList.remove("hidden");
+  document.body.style.overflow="hidden";
   updateImageZoom();
 }
-function closeImageViewer(){document.getElementById("imageViewer").classList.add("hidden")}
-function zoomImage(delta){viewerScale=Math.min(3,Math.max(.6,viewerScale+delta));updateImageZoom()}
-function resetImageZoom(){viewerScale=1;updateImageZoom()}
+function closeImageViewer(){
+  document.getElementById("imageViewer").classList.add("hidden");
+  document.body.style.overflow="";
+  document.getElementById("viewerImage").src="";
+}
+function zoomImage(delta){
+  viewerScale=Math.min(4,Math.max(.6,viewerScale+delta));
+  if(viewerScale<=1){viewerX=0;viewerY=0;}
+  updateImageZoom();
+}
+function resetImageZoom(){viewerScale=1;viewerX=0;viewerY=0;updateImageZoom()}
 function updateImageZoom(){
-  document.getElementById("viewerImage").style.transform=`scale(${viewerScale})`;
+  document.getElementById("viewerImage").style.transform=`translate(${viewerX}px,${viewerY}px) scale(${viewerScale})`;
   document.getElementById("zoomLabel").textContent=Math.round(viewerScale*100)+"%";
 }
+
 document.getElementById("productsGrid").addEventListener("click",e=>{
   const preview=e.target.closest(".product-image[data-preview=\"true\"]");
   if(!preview) return;
@@ -99,13 +129,68 @@ document.getElementById("imageViewer").addEventListener("click",e=>{
 
 document.getElementById("viewerImage").addEventListener("wheel",e=>{
   e.preventDefault();
-  zoomImage(e.deltaY < 0 ? 0.15 : -0.15);
+  zoomImage(e.deltaY<0?0.15:-0.15);
 },{passive:false});
+
+const viewerImage=document.getElementById("viewerImage");
+viewerImage.addEventListener("mousedown",e=>{
+  if(viewerScale<=1)return;
+  viewerDragging=true;
+  viewerDragStartX=e.clientX-viewerX;
+  viewerDragStartY=e.clientY-viewerY;
+  e.preventDefault();
+});
+document.addEventListener("mousemove",e=>{
+  if(!viewerDragging)return;
+  viewerX=e.clientX-viewerDragStartX;
+  viewerY=e.clientY-viewerDragStartY;
+  updateImageZoom();
+});
+document.addEventListener("mouseup",()=>viewerDragging=false);
+
+function touchDistance(a,b){
+  const dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;
+  return Math.hypot(dx,dy);
+}
+function touchMidpoint(a,b){
+  return {x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};
+}
+viewerImage.addEventListener("touchstart",e=>{
+  if(e.touches.length===2){
+    pinchStartDistance=touchDistance(e.touches[0],e.touches[1]);
+    pinchStartScale=viewerScale;
+    viewerDragging=false;
+    return;
+  }
+  if(e.touches.length===1 && viewerScale>1){
+    viewerDragging=true;
+    viewerDragStartX=e.touches[0].clientX-viewerX;
+    viewerDragStartY=e.touches[0].clientY-viewerY;
+  }
+},{passive:true});
+viewerImage.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  if(e.touches.length===2){
+    const ratio=touchDistance(e.touches[0],e.touches[1])/Math.max(1,pinchStartDistance);
+    viewerScale=Math.min(4,Math.max(.6,pinchStartScale*ratio));
+    if(viewerScale<=1){viewerX=0;viewerY=0;}
+    updateImageZoom();
+    return;
+  }
+  if(e.touches.length===1 && viewerDragging){
+    viewerX=e.touches[0].clientX-viewerDragStartX;
+    viewerY=e.touches[0].clientY-viewerDragStartY;
+    updateImageZoom();
+  }
+},{passive:false});
+viewerImage.addEventListener("touchend",e=>{
+  if(e.touches.length===0){viewerDragging=false;pinchStartDistance=0;}
+});
 
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape") closeImageViewer();
-  if(document.getElementById("imageViewer").classList.contains("hidden")) return;
-  if(e.key==="+") zoomImage(0.15);
-  if(e.key==="-") zoomImage(-0.15);
-  if(e.key==="0") resetImageZoom();
+  if(document.getElementById("imageViewer").classList.contains("hidden"))return;
+  if(e.key==="+")zoomImage(0.15);
+  if(e.key==="-")zoomImage(-0.15);
+  if(e.key==="0")resetImageZoom();
 });
