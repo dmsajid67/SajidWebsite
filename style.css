@@ -33,3 +33,15 @@ body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--ink)}bu
 .discount-chip{color:#be185d!important;background:#fdf2f8!important;border-color:#fbcfe8!important}
 .upcoming-chip{color:#0369a1!important;background:#eff6ff!important;border-color:#bfdbfe!important}
 .upcoming-tag{background:#e0f2fe!important;color:#0369a1!important}
+
+/* Click-to-preview product images */
+.product-image[data-preview="true"]{cursor:zoom-in}
+.viewer-stage{cursor:default}
+.viewer-stage img{cursor:zoom-in}
+@media(max-width:650px){
+  .viewer-box{width:96vw;height:88vh;border-radius:18px}
+  .viewer-stage{padding:12px}
+  .viewer-toolbar{padding:10px}
+  .viewer-toolbar button{padding:8px 12px}
+  .viewer-close{right:10px;top:10px;width:40px;height:40px}
+}
