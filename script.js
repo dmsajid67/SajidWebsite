@@ -1,80 +1,388 @@
+// ================================
+// LOGIN SYSTEM
+// ================================
+
 let loggedIn = localStorage.getItem("loggedIn") === "true";
+
 let pendingFile = null;
 
-function openLogin(){document.getElementById("authModal").classList.remove("hidden");showLogin()}
-function closeAuth(){document.getElementById("authModal").classList.add("hidden");pendingFile=null}
-function outsideClose(e){if(e.target.id==="authModal")closeAuth()}
-function showLogin(){document.getElementById("loginForm").classList.remove("hidden");document.getElementById("registerForm").classList.add("hidden")}
-function showRegister(){document.getElementById("loginForm").classList.add("hidden");document.getElementById("registerForm").classList.remove("hidden")}
 
-function downloadFile(path){
-  if(loggedIn){startDownload(path);return}
-  pendingFile=path;
-  openLogin();
+// ================================
+// OPEN LOGIN
+// ================================
+
+function openLogin() {
+    document
+        .getElementById("authModal")
+        .classList.remove("hidden");
+
+    showLogin();
 }
 
-function startDownload(path){
-  const a=document.createElement("a");
-  a.href=path;
-  a.download="";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+
+// ================================
+// CLOSE LOGIN
+// ================================
+
+function closeAuth() {
+    document
+        .getElementById("authModal")
+        .classList.add("hidden");
+
+    pendingFile = null;
 }
 
-function login(){
-  const user=document.getElementById("loginUser").value.trim();
-  const password=document.getElementById("loginPassword").value;
-  if(!user||!password){alert("Please enter username/Gmail and password.");return}
-  localStorage.setItem("loggedIn","true");
-  localStorage.setItem("username",user);
-  loggedIn=true;
-  const file=pendingFile;
-  pendingFile=null;
-  closeAuth();
-  updateUI();
-  alert("Login successful!");
-  if(file)startDownload(file);
+
+// ================================
+// CLICK OUTSIDE POPUP
+// ================================
+
+function outsideClose(event) {
+    if (event.target.id === "authModal") {
+        closeAuth();
+    }
 }
 
-function register(){
-  const username=document.getElementById("registerUsername").value.trim();
-  const email=document.getElementById("registerEmail").value.trim();
-  const password=document.getElementById("registerPassword").value;
-  const confirm=document.getElementById("registerConfirm").value;
-  if(!username||!email||!password||!confirm){alert("Please fill in all fields.");return}
-  if(password!==confirm){alert("Passwords do not match!");return}
-  localStorage.setItem("loggedIn","true");
-  localStorage.setItem("username",username);
-  localStorage.setItem("email",email);
-  loggedIn=true;
-  const file=pendingFile;
-  pendingFile=null;
-  closeAuth();
-  updateUI();
-  alert("Account created successfully!");
-  if(file)startDownload(file);
+
+// ================================
+// SHOW LOGIN
+// ================================
+
+function showLogin() {
+    document
+        .getElementById("loginForm")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("registerForm")
+        .classList.add("hidden");
 }
 
-function logout(){
-  localStorage.removeItem("loggedIn");
-  localStorage.removeItem("username");
-  localStorage.removeItem("email");
-  loggedIn=false;
-  updateUI();
-  alert("You have been logged out.");
+
+// ================================
+// SHOW REGISTER
+// ================================
+
+function showRegister() {
+    document
+        .getElementById("loginForm")
+        .classList.add("hidden");
+
+    document
+        .getElementById("registerForm")
+        .classList.remove("hidden");
 }
 
-function updateUI(){
-  document.getElementById("loginNavBtn").classList.toggle("hidden",loggedIn);
-  document.getElementById("logoutNavBtn").classList.toggle("hidden",!loggedIn);
+
+// ================================
+// DOWNLOAD BUTTON
+// ================================
+
+function downloadFile(filePath) {
+
+    // Already logged in
+    if (loggedIn) {
+        startDownload(filePath);
+        return;
+    }
+
+    // Save requested file
+    pendingFile = filePath;
+
+    // Open login popup
+    openLogin();
 }
 
-function searchItems(){
-  const q=document.getElementById("searchInput").value.toLowerCase().trim();
-  document.querySelectorAll(".searchable").forEach(item=>{
-    item.style.display=item.dataset.name.toLowerCase().includes(q)?"":"none";
-  });
+
+// ================================
+// ACTUAL DOWNLOAD
+// ================================
+
+function startDownload(filePath) {
+
+    const link = document.createElement("a");
+
+    link.href = filePath;
+
+    link.download = "";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
 }
+
+
+// ================================
+// LOGIN
+// ================================
+
+function login() {
+
+    const user =
+        document
+            .getElementById("loginUser")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("loginPassword")
+            .value;
+
+
+    if (user === "" || password === "") {
+
+        alert(
+            "Please enter username/Gmail and password."
+        );
+
+        return;
+    }
+
+
+    // Demo login
+    localStorage.setItem(
+        "loggedIn",
+        "true"
+    );
+
+    localStorage.setItem(
+        "username",
+        user
+    );
+
+
+    loggedIn = true;
+
+
+    // Save file before closing popup
+    const file = pendingFile;
+
+    pendingFile = null;
+
+
+    closeAuth();
+
+    updateUI();
+
+
+    alert("Login successful! 🎉");
+
+
+    // Download selected file
+    if (file) {
+        startDownload(file);
+    }
+}
+
+
+// ================================
+// REGISTER
+// ================================
+
+function register() {
+
+    const username =
+        document
+            .getElementById("registerUsername")
+            .value
+            .trim();
+
+    const email =
+        document
+            .getElementById("registerEmail")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("registerPassword")
+            .value;
+
+    const confirm =
+        document
+            .getElementById("registerConfirm")
+            .value;
+
+
+    if (
+        username === "" ||
+        email === "" ||
+        password === "" ||
+        confirm === ""
+    ) {
+
+        alert(
+            "Please fill in all fields."
+        );
+
+        return;
+    }
+
+
+    if (password !== confirm) {
+
+        alert(
+            "Passwords do not match!"
+        );
+
+        return;
+    }
+
+
+    // Demo registration
+    localStorage.setItem(
+        "loggedIn",
+        "true"
+    );
+
+    localStorage.setItem(
+        "username",
+        username
+    );
+
+    localStorage.setItem(
+        "email",
+        email
+    );
+
+
+    loggedIn = true;
+
+
+    // Save file before closing popup
+    const file = pendingFile;
+
+    pendingFile = null;
+
+
+    closeAuth();
+
+    updateUI();
+
+
+    alert(
+        "Account created successfully! 🎉"
+    );
+
+
+    // Download selected file
+    if (file) {
+        startDownload(file);
+    }
+}
+
+
+// ================================
+// LOGOUT
+// ================================
+
+function logout() {
+
+    localStorage.removeItem("loggedIn");
+
+    localStorage.removeItem("username");
+
+    localStorage.removeItem("email");
+
+
+    loggedIn = false;
+
+
+    updateUI();
+
+
+    alert(
+        "You have been logged out."
+    );
+}
+
+
+// ================================
+// UPDATE LOGIN BUTTON
+// ================================
+
+function updateUI() {
+
+    const loginButton =
+        document.getElementById(
+            "loginNavBtn"
+        );
+
+    const logoutButton =
+        document.getElementById(
+            "logoutNavBtn"
+        );
+
+
+    if (loggedIn) {
+
+        loginButton.classList.add(
+            "hidden"
+        );
+
+        logoutButton.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        loginButton.classList.remove(
+            "hidden"
+        );
+
+        logoutButton.classList.add(
+            "hidden"
+        );
+    }
+}
+
+
+// ================================
+// SEARCH
+// ================================
+
+function searchItems() {
+
+    const query =
+        document
+            .getElementById("searchInput")
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    const items =
+        document.querySelectorAll(
+            ".searchable"
+        );
+
+
+    items.forEach(item => {
+
+        const name =
+            item
+                .getAttribute("data-name")
+                .toLowerCase();
+
+
+        if (name.includes(query)) {
+
+            item.style.display = "";
+
+        } else {
+
+            item.style.display = "none";
+        }
+
+    });
+}
+
+
+// ================================
+// PAGE LOAD
+// ================================
 
 updateUI();
