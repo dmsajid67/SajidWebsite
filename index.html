@@ -15,7 +15,8 @@
   </a>
 
   <nav class="desktop-nav">
-    <button class="nav-btn active" onclick="showSection('shop')">Collection</button>
+    <button id="homeBtn" class="nav-btn home-btn active" onclick="goHome()">⌂ Home</button>
+    <button class="nav-btn" onclick="showCollection()">Collection</button>
     <button class="nav-btn" onclick="showSection('lookbooks')">Lookbooks</button>
     <button class="nav-btn" onclick="showSection('orders')">My Orders</button>
   </nav>
@@ -41,7 +42,7 @@
     <div class="hero-copy">
       <span class="pill">✦ AUTUMN / WINTER 2026</span>
       <h1>Welcome to<br><span>Sajid ENTERPRICE.</span></h1>
-      <p>Real product photos, shirts, t-shirts and pants from Sajid ENTERPRICE.</p>
+      <p>Real product photos, shirts, t-shirts and pants from Sajid ENTERPRICE. New drops, discounts and upcoming styles.</p>
       <button class="hero-btn" onclick="scrollToProducts()">Explore Collection</button>
     </div>
     <div class="hero-art">
@@ -57,7 +58,9 @@
         <button class="chip" onclick="filterCategory('pants',this)">Pants</button>
         <button class="chip" onclick="filterCategory('shirts',this)">Shirts</button>
         <button class="chip" onclick="filterCategory('tshirts',this)">T-Shirts</button>
-        <button class="chip" onclick="filterCategory('discount',this)">🔥 Discount</button>
+        <button class="chip new-chip" onclick="filterCategory('new',this)">✨ New</button>
+        <button class="chip discount-chip" onclick="filterCategory('discount',this)">🔥 Discount</button>
+        <button class="chip upcoming-chip" onclick="filterCategory('upcoming',this)">🕒 Upcoming</button>
       </div>
     </div>
 
@@ -162,6 +165,22 @@
 </div>
 
 <div id="toast" class="toast hidden"></div>
+
+<div id="imageViewer" class="image-viewer hidden">
+  <div class="viewer-box">
+    <button class="viewer-close" onclick="closeImageViewer()">×</button>
+    <div class="viewer-toolbar">
+      <button onclick="zoomImage(-0.15)">−</button>
+      <span id="zoomLabel">100%</span>
+      <button onclick="zoomImage(0.15)">＋</button>
+      <button onclick="resetImageZoom()">Reset</button>
+    </div>
+    <div class="viewer-stage">
+      <img id="viewerImage" src="" alt="">
+    </div>
+    <div class="viewer-name" id="viewerName"></div>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
