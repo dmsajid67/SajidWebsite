@@ -1,141 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sajid • Wallpapers & Files</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<header class="navbar">
-  <a class="brand" href="#home">SAJID<span>✦</span></a>
-  <nav>
-    <a href="#home">Home</a>
-    <a href="#wallpapers">Wallpapers</a>
-    <a href="#files">Files</a>
-  </nav>
-  <div class="account">
-    <button id="loginNavBtn" class="dark-btn" onclick="openLogin()">Login</button>
-    <button id="logoutNavBtn" class="dark-btn hidden" onclick="logout()">Logout</button>
-  </div>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sajid Luxe • Wallpapers & Files</title><link rel="stylesheet" href="style.css">
+</head><body>
+<header class="topbar">
+<a class="brand" href="#home"><span class="brand-mark">S</span><span><b>SAJID LUXE</b><small>WALLPAPERS & FILES</small></span></a>
+<nav><button class="nav-btn active" onclick="switchTab('home')">⌂ Home</button><button class="nav-btn" onclick="switchTab('wallpapers')">▧ Wallpapers</button><button class="nav-btn" onclick="switchTab('files')">▣ Files</button></nav>
+<div class="actions"><label class="top-search">⌕<input id="searchInput" placeholder="Search..." oninput="handleSearch()"></label><button class="account-btn" onclick="openAuth()"><span class="avatar">S</span><span id="accountLabel">Sign In</span></button></div>
 </header>
 
-<main>
-  <section class="hero" id="home">
-    <div class="hero-inner">
-      <div class="eyebrow">✦ FREE WALLPAPERS & FILES</div>
-      <h1>Discover something<br><em>beautiful.</em></h1>
-      <p>Beautiful wallpapers and useful files, all in one place.</p>
-      <label class="search">
-        <span>⌕</span>
-        <input id="searchInput" type="search" placeholder="Search wallpapers or files..." oninput="searchItems()">
-      </label>
-    </div>
-  </section>
+<section id="tab-home" class="tab">
+<section class="hero"><div class="hero-content"><span class="pill">✦ CURATED DIGITAL COLLECTION</span><h1>Beautiful things.<br><span>Ready to download.</span></h1><p>Explore premium-looking wallpapers and useful files in one clean library.</p>
+<div class="hero-search">⌕<input id="heroSearch" placeholder="Search wallpapers, PDFs, ZIPs..." oninput="syncSearch(this.value)"><button onclick="switchTab('wallpapers')">Explore</button></div></div></section>
+<section class="section"><div class="section-title"><div><label>FEATURED</label><h2>Fresh from the collection</h2></div><button class="text-btn" onclick="switchTab('wallpapers')">View all →</button></div><div id="featuredGrid" class="card-grid"></div></section>
+<section class="section"><div class="promo"><div><label>MEMBERS AREA</label><h2>One sign in. Then download freely.</h2><p>Visitors browse first. Login is requested only when a download starts.</p></div><button class="primary-btn" onclick="openAuth()">Create account</button></div></section>
+</section>
 
-  <section class="section" id="wallpapers">
-    <div class="section-head">
-      <div>
-        <div class="label">EXPLORE</div>
-        <h2>Latest Wallpapers</h2>
-      </div>
-      <span class="muted">HD • 4K</span>
-    </div>
+<section id="tab-wallpapers" class="tab hidden"><section class="section"><div class="section-title"><div><label>DISCOVER</label><h2>Wallpaper collection</h2></div><div class="filters"><button class="filter active" onclick="filterWallpapers('all',this)">All</button><button class="filter" onclick="filterWallpapers('nature',this)">Nature</button><button class="filter" onclick="filterWallpapers('ocean',this)">Ocean</button><button class="filter" onclick="filterWallpapers('mountain',this)">Mountain</button></div></div><div id="wallpaperGrid" class="card-grid"></div></section></section>
 
-    <div class="gallery">
-      <article class="photo-card searchable" data-name="sunset nature wallpaper">
-        <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1400&q=85" alt="Sunset nature">
-        <div class="photo-info">
-          <div><h3>Sunset Nature</h3><p>Wallpaper</p></div>
-          <button onclick="downloadFile('downloads/sunset.svg')" aria-label="Download Sunset Nature">↓</button>
-        </div>
-      </article>
+<section id="tab-files" class="tab hidden"><section class="section"><div class="section-title"><div><label>LIBRARY</label><h2>Downloadable files</h2></div></div><div id="fileGrid" class="file-grid"></div></section></section>
 
-      <article class="photo-card searchable" data-name="forest wallpaper">
-        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1400&q=85" alt="Forest">
-        <div class="photo-info">
-          <div><h3>Deep Forest</h3><p>Wallpaper</p></div>
-          <button onclick="downloadFile('downloads/forest.svg')" aria-label="Download Deep Forest">↓</button>
-        </div>
-      </article>
+<footer><b>SAJID LUXE ✦</b><p>Digital wallpapers, documents and files.</p><small>© 2026 Sajid</small></footer>
 
-      <article class="photo-card searchable" data-name="ocean beach wallpaper">
-        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=85" alt="Ocean">
-        <div class="photo-info">
-          <div><h3>Blue Ocean</h3><p>Wallpaper</p></div>
-          <button onclick="downloadFile('downloads/ocean.svg')" aria-label="Download Blue Ocean">↓</button>
-        </div>
-      </article>
-
-      <article class="photo-card searchable" data-name="mountain landscape wallpaper">
-        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=85" alt="Mountain">
-        <div class="photo-info">
-          <div><h3>Mountain View</h3><p>Wallpaper</p></div>
-          <button onclick="downloadFile('downloads/mountain.svg')" aria-label="Download Mountain View">↓</button>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section class="section" id="files">
-    <div class="section-head">
-      <div>
-        <div class="label">DOWNLOAD</div>
-        <h2>Useful Files</h2>
-      </div>
-    </div>
-
-    <div class="file-grid">
-      <article class="file-card searchable" data-name="welcome text file">
-        <div class="file-icon txt">TXT</div>
-        <div class="file-main"><h3>Welcome File</h3><p>Text document</p></div>
-        <button onclick="downloadFile('downloads/welcome.txt')">Download</button>
-      </article>
-
-      <article class="file-card searchable" data-name="sample pdf guide">
-        <div class="file-icon pdf">PDF</div>
-        <div class="file-main"><h3>Sample Guide</h3><p>PDF document</p></div>
-        <button onclick="downloadFile('downloads/guide.pdf')">Download</button>
-      </article>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <a class="brand" href="#home">SAJID<span>✦</span></a>
-  <p>Wallpapers, files & more.</p>
-  <small>© 2026 Sajid</small>
-</footer>
-
-<div id="authModal" class="modal hidden" onclick="outsideClose(event)">
-  <div class="auth-box">
-    <button class="close" onclick="closeAuth()">×</button>
-
-    <div id="loginForm">
-      <div class="auth-icon">🔐</div>
-      <h2>Welcome back</h2>
-      <p>Login to download this file.</p>
-      <input id="loginUser" type="text" placeholder="Username or Gmail">
-      <input id="loginPassword" type="password" placeholder="Password">
-      <button class="auth-btn" onclick="login()">Login & Download</button>
-      <div class="switch">Don't have an account? <span onclick="showRegister()">Register</span></div>
-    </div>
-
-    <div id="registerForm" class="hidden">
-      <div class="auth-icon">✨</div>
-      <h2>Create account</h2>
-      <p>Create an account to download.</p>
-      <input id="registerUsername" type="text" placeholder="Username">
-      <input id="registerEmail" type="email" placeholder="Gmail">
-      <input id="registerPassword" type="password" placeholder="Password">
-      <input id="registerConfirm" type="password" placeholder="Confirm Password">
-      <button class="auth-btn" onclick="register()">Create Account & Download</button>
-      <div class="switch">Already have an account? <span onclick="showLogin()">Login</span></div>
-    </div>
-  </div>
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
+<div id="authModal" class="modal hidden"><div class="modal-card"><button class="close" onclick="closeAuth()">×</button><div class="auth-logo">S</div>
+<div id="loginBox"><label>MEMBER ACCESS</label><h2>Welcome back</h2><p>Sign in to continue with your download.</p><input id="loginUser" placeholder="Username or Gmail"><input id="loginPassword" type="password" placeholder="Password"><button class="primary-btn full" onclick="login()">Sign in & download</button><div class="switch">New here? <button onclick="showRegister()">Create an account</button></div></div>
+<div id="registerBox" class="hidden"><label>CREATE ACCOUNT</label><h2>Join Sajid Luxe</h2><p>Create your account to unlock downloads.</p><input id="registerUsername" placeholder="Username"><input id="registerEmail" type="email" placeholder="Gmail"><input id="registerPassword" type="password" placeholder="Password"><input id="registerConfirm" type="password" placeholder="Confirm password"><button class="primary-btn full" onclick="register()">Create account & download</button><div class="switch">Already a member? <button onclick="showLogin()">Sign in</button></div></div>
+</div></div>
+<script src="script.js"></script></body></html>
