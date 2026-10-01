@@ -1,3 +1,7 @@
-function sayHello() {
-    alert("Hello ngga! 😎 Welcome to my website!");
+function login() {
+    alert("🔐 Login button clicked!");
+}
+
+function register() {
+    alert("📝 Register button clicked!");
 }
