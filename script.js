@@ -1,26 +1,45 @@
-const wallpapers=[
-{name:"Sunset Nature",cat:"nature",type:"4K",image:"https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=82",file:"sunset.svg"},
-{name:"Deep Forest",cat:"nature",type:"HD",image:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=82",file:"forest.svg"},
-{name:"Blue Ocean",cat:"ocean",type:"4K",image:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=82",file:"ocean.svg"},
-{name:"Mountain View",cat:"mountain",type:"4K",image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=82",file:"mountain.svg"}];
-const files=[{name:"Welcome File",type:"TXT",desc:"Text document",file:"welcome.txt"},{name:"Sample Guide",type:"PDF",desc:"PDF document",file:"guide.pdf"},{name:"File Pack",type:"ZIP",desc:"ZIP archive",file:"file-pack.zip"}];
-let loggedIn=localStorage.getItem("sajid_logged_in")==="true",pendingFile=null;
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function wallpaperCard(x){return `<article class="card searchable" data-name="${esc(x.name)} ${esc(x.cat)}"><div class="thumb"><img src="${x.image}" alt="${esc(x.name)}"><span class="badge">${x.type}</span></div><div class="card-body"><h3>${esc(x.name)}</h3><p>${esc(x.cat)} wallpaper</p><button class="download-btn" onclick="downloadFile('${x.file}')">↓ Download</button></div></article>`}
-function renderWallpapers(list=wallpapers){document.getElementById("wallpaperGrid").innerHTML=list.map(wallpaperCard).join("");document.getElementById("featuredGrid").innerHTML=wallpapers.map(wallpaperCard).join("")}
-function renderFiles(){document.getElementById("fileGrid").innerHTML=files.map(x=>`<article class="file-card searchable" data-name="${esc(x.name)} ${esc(x.type)}"><div class="file-icon ${x.type.toLowerCase()}">${x.type}</div><div class="file-info"><h3>${esc(x.name)}</h3><p>${esc(x.desc)}</p></div><button class="file-download" onclick="downloadFile('${x.file}')">Download</button></article>`).join("")}
-function switchTab(t){document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));document.getElementById("tab-"+t).classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})}
-function filterWallpapers(cat,btn){document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));btn.classList.add("active");renderWallpapers(cat==="all"?wallpapers:wallpapers.filter(x=>x.cat===cat))}
-function handleSearch(){const q=document.getElementById("searchInput").value.toLowerCase().trim();document.querySelectorAll(".searchable").forEach(x=>x.style.display=x.dataset.name.toLowerCase().includes(q)?"":"none")}
-function syncSearch(v){document.getElementById("searchInput").value=v;handleSearch();if(v.trim())switchTab("wallpapers")}
+const products=[
+{id:"p1",name:"Vintage Acid Wash Denim Pants",cat:"pants",price:89,old:115,sale:true,new:true,image:"images/shirt-model-1.png",desc:"Relaxed straight-leg denim with premium heavyweight cotton."},
+{id:"p2",name:"Tailored Purple Accent Trousers",cat:"pants",price:110,old:110,sale:false,new:true,image:"images/kurta-model-2.png",desc:"Clean pleated trousers for a sleek modern silhouette."},
+{id:"p3",name:"Minimalist Cargo Track Pants",cat:"pants",price:75,old:95,sale:true,new:false,image:"images/shirt-model-3.png",desc:"Utility-pocket relaxed joggers with adjustable ankle toggles."},
+{id:"s1",name:"Oversized Oxford Shirt",cat:"shirts",price:68,old:85,sale:true,new:true,image:"images/jersey-model-4.png",desc:"Crisp organic cotton button-up with dropped shoulders."},
+{id:"s2",name:"Silk Blend Evening Cuban Shirt",cat:"shirts",price:125,old:125,sale:false,new:true,image:"images/printed-shirt-model-5.png",desc:"Fluid Cuban-collar shirt in a deep plum finish."},
+{id:"t1",name:"Heavyweight Purple Glow Tee",cat:"tshirts",price:45,old:60,sale:true,new:true,image:"images/kurta-model-6.png",desc:"280 GSM boxy-fit t-shirt with bold graphic styling."},
+{id:"t2",name:"Essential White Luxe Crew Tee",cat:"tshirts",price:38,old:38,sale:false,new:false,image:"https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=700&q=80",desc:"Soft everyday crew neck made for clean styling."},
+{id:"t3",name:"Distressed Vintage Wash Tee",cat:"tshirts",price:42,old:55,sale:true,new:false,image:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=700&q=80",desc:"Washed oversized tee with subtle distressed detailing."}
+];
+let cart=JSON.parse(localStorage.getItem("sajid_cart")||"[]");
+let orders=JSON.parse(localStorage.getItem("sajid_orders")||"[]");
+let logged=localStorage.getItem("sajid_logged")==="true";
+function save(){localStorage.setItem("sajid_cart",JSON.stringify(cart));localStorage.setItem("sajid_orders",JSON.stringify(orders));}
+function money(n){return "$"+n.toFixed(2)}
+function renderProducts(list=products){
+ document.getElementById("productsGrid").innerHTML=list.map(p=>`<article class="product" data-name="${p.name.toLowerCase()} ${p.cat}"><div class="product-image"><img src="${p.image}" alt="${p.name}">${p.new?'<span class="tag">NEW</span>':''}${p.sale?'<span class="tag sale" style="top:45px">SALE</span>':''}</div><div class="product-body"><span class="cat">${p.cat}</span><h3>${p.name}</h3><p class="desc">${p.desc}</p><div class="price-row"><span class="price">${money(p.price)}</span>${p.sale?`<span class="old">${money(p.old)}</span>`:""}</div><div class="product-actions"><button class="bag-add" onclick="addToCart('${p.id}')">＋ Add Bag</button><button class="buy-now" onclick="buyNow('${p.id}')">Buy Now</button></div></div></article>`).join("");
+}
+function filterCategory(cat,btn){document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));btn.classList.add("active");renderProducts(cat==="all"?products:cat==="discount"?products.filter(p=>p.sale):products.filter(p=>p.cat===cat))}
+function searchProducts(){const q=document.getElementById("search").value.toLowerCase().trim();renderProducts(products.filter(p=>(p.name+" "+p.cat+" "+p.desc).toLowerCase().includes(q)))}
+function scrollToProducts(){document.querySelector(".content").scrollIntoView({behavior:"smooth"})}
+function addToCart(id){const p=products.find(x=>x.id===id);if(!p)return;const row=cart.find(x=>x.id===id);if(row)row.qty++;else cart.push({id,qty:1});save();renderCart();toast("Added to your bag.");}
+function buyNow(id){addToCart(id);toggleCart()}
+function renderCart(){
+ const el=document.getElementById("cartItems"),count=cart.reduce((a,x)=>a+x.qty,0);document.getElementById("cartCount").textContent=count;
+ if(!cart.length){el.innerHTML='<div style="text-align:center;color:#999;padding:60px 10px;font-size:12px">Your bag is empty.</div>';document.getElementById("cartTotal").textContent="$0.00";return}
+ let total=0;el.innerHTML=cart.map(row=>{const p=products.find(x=>x.id===row.id);total+=p.price*row.qty;return`<div class="cart-row"><img src="${p.image}"><div class="cart-row-main"><h4>${p.name}</h4><p>${money(p.price)}</p><div class="qty"><button onclick="changeQty('${p.id}',-1)">−</button><b>${row.qty}</b><button onclick="changeQty('${p.id}',1)">＋</button></div></div><button class="remove" onclick="removeItem('${p.id}')">Remove</button></div>`}).join("");document.getElementById("cartTotal").textContent=money(total);
+}
+function changeQty(id,n){const r=cart.find(x=>x.id===id);if(!r)return;r.qty+=n;if(r.qty<=0)cart=cart.filter(x=>x.id!==id);save();renderCart()}
+function removeItem(id){cart=cart.filter(x=>x.id!==id);save();renderCart()}
+function toggleCart() {document.getElementById("cartDrawer").classList.toggle("hidden")}
+function checkout(){if(!cart.length){toast("Your bag is empty.");return}if(!logged){openAuth();return}let total=cart.reduce((sum,r)=>sum+products.find(p=>p.id===r.id).price*r.qty,0);orders.unshift({id:"ORD-"+Math.floor(10000+Math.random()*90000),date:new Date().toLocaleDateString(),total,items:cart.map(r=>({name:products.find(p=>p.id===r.id).name,qty:r.qty,price:products.find(p=>p.id===r.id).price})),status:"Processing"});cart=[];save();renderCart();toggleCart();renderOrders();showSection("orders");toast("Order placed successfully!")}
+function renderOrders(){const el=document.getElementById("ordersList");if(!orders.length){el.innerHTML='<div class="order-card" style="text-align:center;color:#999">No orders yet.</div>';return}el.className="orders-list";el.innerHTML=orders.map(o=>`<article class="order-card"><div class="order-top"><div><div class="order-id">${o.id}</div><small>${o.date}</small></div><b>${money(o.total)}</b></div><div class="order-products">${o.items.map(i=>`<div>${i.qty}× ${i.name} — ${money(i.price*i.qty)}</div>`).join("")}</div><div class="status">● ${o.status}</div></article>`).join("")}
+function showSection(id){document.querySelectorAll("main .section").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));const buttons=[...document.querySelectorAll(".nav-btn")];const map={shop:0,lookbooks:1,orders:2};if(map[id]!==undefined)buttons[map[id]].classList.add("active");window.scrollTo({top:0,behavior:"smooth"})}
 function openAuth(){document.getElementById("authModal").classList.remove("hidden");showLogin()}
-function closeAuth(){document.getElementById("authModal").classList.add("hidden");pendingFile=null}
-function showLogin(){document.getElementById("loginBox").classList.remove("hidden");document.getElementById("registerBox").classList.add("hidden")}
-function showRegister(){document.getElementById("loginBox").classList.add("hidden");document.getElementById("registerBox").classList.remove("hidden")}
-function updateAccount(){document.getElementById("accountLabel").textContent=loggedIn?(localStorage.getItem("sajid_user")||"Account"):"Sign In"}
-function downloadFile(file){if(loggedIn){startDownload(file);return}pendingFile=file;openAuth()}
-function startDownload(file){const a=document.createElement("a");a.href=file;a.download="";document.body.appendChild(a);a.click();a.remove()}
-function login(){const u=document.getElementById("loginUser").value.trim(),p=document.getElementById("loginPassword").value;if(!u||!p){alert("Please enter username/Gmail and password.");return}localStorage.setItem("sajid_logged_in","true");localStorage.setItem("sajid_user",u);loggedIn=true;const f=pendingFile;pendingFile=null;closeAuth();updateAccount();alert("Login successful!");if(f)startDownload(f)}
-function register(){const u=document.getElementById("registerUsername").value.trim(),e=document.getElementById("registerEmail").value.trim(),p=document.getElementById("registerPassword").value,c=document.getElementById("registerConfirm").value;if(!u||!e||!p||!c){alert("Please fill in all fields.");return}if(p!==c){alert("Passwords do not match!");return}localStorage.setItem("sajid_logged_in","true");localStorage.setItem("sajid_user",u);loggedIn=true;const f=pendingFile;pendingFile=null;closeAuth();updateAccount();alert("Account created!");if(f)startDownload(f)}
-document.getElementById("authModal").addEventListener("click",e=>{if(e.target.id==="authModal")closeAuth()});
-renderWallpapers();renderFiles();updateAccount();
+function closeAuth(){document.getElementById("authModal").classList.add("hidden")}
+function showLogin(){document.getElementById("loginForm").classList.remove("hidden");document.getElementById("registerForm").classList.add("hidden")}
+function showRegister(){document.getElementById("loginForm").classList.add("hidden");document.getElementById("registerForm").classList.remove("hidden")}
+function login(){const u=document.getElementById("loginUser").value.trim(),p=document.getElementById("loginPass").value;if(!u||!p){alert("Enter username/Gmail and password.");return}logged=true;localStorage.setItem("sajid_logged","true");localStorage.setItem("sajid_user",u);updateProfile();closeAuth();toast("Signed in successfully.");}
+function register(){const u=document.getElementById("regUser").value.trim(),e=document.getElementById("regEmail").value.trim(),p=document.getElementById("regPass").value,c=document.getElementById("regConfirm").value;if(!u||!e||!p||!c){alert("Please fill in all fields.");return}if(p!==c){alert("Passwords do not match.");return}logged=true;localStorage.setItem("sajid_logged","true");localStorage.setItem("sajid_user",u);localStorage.setItem("sajid_email",e);updateProfile();closeAuth();toast("Account created.");}
+function logout(){logged=false;localStorage.removeItem("sajid_logged");localStorage.removeItem("sajid_user");localStorage.removeItem("sajid_email");document.getElementById("profileMenu").classList.add("hidden");updateProfile();toast("Signed out.")}
+function toggleProfile(){document.getElementById("profileMenu").classList.toggle("hidden");}
+function updateProfile(){const u=localStorage.getItem("sajid_user")||"Sign In",email=localStorage.getItem("sajid_email")||"Not signed in";document.getElementById("profileName").textContent=logged?u:"Sign In";document.getElementById("avatar").textContent=logged?u[0].toUpperCase():"S";document.getElementById("menuUser").textContent=logged?u:"Guest";document.getElementById("menuEmail").textContent=logged?email:"Not signed in"}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),2500)}
+renderProducts();renderCart();renderOrders();updateProfile();
