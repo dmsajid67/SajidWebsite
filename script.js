@@ -14,7 +14,7 @@ let logged=localStorage.getItem("sajid_logged")==="true";
 function save(){localStorage.setItem("sajid_cart",JSON.stringify(cart));localStorage.setItem("sajid_orders",JSON.stringify(orders));}
 function money(n){return "$"+n.toFixed(2)}
 function renderProducts(list=products){
- document.getElementById("productsGrid").innerHTML=list.map(p=>`<article class="product" data-name="${p.name.toLowerCase()} ${p.cat}"><div class="product-image"><img src="${p.image}" alt="${p.name}">${p.new?'<span class="tag">NEW</span>':''}${p.sale?'<span class="tag sale" style="top:45px">SALE</span>':''}${p.upcoming?'<span class="tag upcoming-tag" style="top:75px">UPCOMING</span>':''}</div><div class="product-body"><span class="cat">${p.cat}</span><h3>${p.name}</h3><p class="desc">${p.desc}</p><div class="price-row"><span class="price">${money(p.price)}</span>${p.sale?`<span class="old">${money(p.old)}</span>`:""}</div><div class="product-actions"><button class="bag-add" onclick="addToCart('${p.id}')">＋ Add Bag</button><button class="buy-now" onclick="buyNow('${p.id}')">Buy Now</button></div></div></article>`).join("");
+ document.getElementById("productsGrid").innerHTML=list.map(p=>`<article class="product" data-name="${p.name.toLowerCase()} ${p.cat}"><div class="product-image" data-preview="true"><img src="${p.image}" alt="${p.name}">${p.new?'<span class="tag">NEW</span>':''}${p.sale?'<span class="tag sale" style="top:45px">SALE</span>':''}${p.upcoming?'<span class="tag upcoming-tag" style="top:75px">UPCOMING</span>':''}</div><div class="product-body"><span class="cat">${p.cat}</span><h3>${p.name}</h3><p class="desc">${p.desc}</p><div class="price-row"><span class="price">${money(p.price)}</span>${p.sale?`<span class="old">${money(p.old)}</span>`:""}</div><div class="product-actions"><button class="bag-add" onclick="addToCart('${p.id}')">＋ Add Bag</button><button class="buy-now" onclick="buyNow('${p.id}')">Buy Now</button></div></div></article>`).join("");
 }
 function goHome(){
   showSection("shop");
@@ -86,7 +86,26 @@ function updateImageZoom(){
   document.getElementById("viewerImage").style.transform=`scale(${viewerScale})`;
   document.getElementById("zoomLabel").textContent=Math.round(viewerScale*100)+"%";
 }
+document.getElementById("productsGrid").addEventListener("click",e=>{
+  const preview=e.target.closest(".product-image[data-preview=\"true\"]");
+  if(!preview) return;
+  const img=preview.querySelector("img");
+  if(img) openImageViewer(img.src,img.alt);
+});
+
 document.getElementById("imageViewer").addEventListener("click",e=>{
   if(e.target.id==="imageViewer") closeImageViewer();
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeImageViewer()});
+
+document.getElementById("viewerImage").addEventListener("wheel",e=>{
+  e.preventDefault();
+  zoomImage(e.deltaY < 0 ? 0.15 : -0.15);
+},{passive:false});
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeImageViewer();
+  if(document.getElementById("imageViewer").classList.contains("hidden")) return;
+  if(e.key==="+") zoomImage(0.15);
+  if(e.key==="-") zoomImage(-0.15);
+  if(e.key==="0") resetImageZoom();
+});
